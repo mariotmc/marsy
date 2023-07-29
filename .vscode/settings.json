@@ -1,0 +1,7 @@
+{
+  "json.schemaDownload.enable": true,
+  "go.toolsEnvVars": {
+    // "CGO_ENABLED": 1,
+    // "GOOS": "windows"
+  }
+}
