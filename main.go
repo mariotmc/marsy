@@ -58,15 +58,12 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)  {
 			return
 		}
 
-		// Check if the message starts with the command prefix, such as "!play".
 		if !strings.HasPrefix(m.Content, "!play") {
 			return
 		}
 
-		// Extract the YouTube URL from the message content.
 		youtubeURL := strings.TrimSpace(strings.TrimPrefix(m.Content, "!play"))
 
-		// Play the song from the YouTube URL.
 		err := playFromYouTubeURL(s, m.GuildID, m.Author.ID, youtubeURL)
 		if err != nil {
 			fmt.Println("Error playing song: ", err)
@@ -75,13 +72,11 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate)  {
 }
 
 func connectToVoiceChannel(s *discordgo.Session, guildID, userID string) (*discordgo.VoiceConnection, error) {
-	// Find the user in the guild's voice state.
 	vs, err := s.State.VoiceState(guildID, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Connect to the voice channel.
 	vc, err := s.ChannelVoiceJoin(guildID, vs.ChannelID, false, false)
 	if err != nil {
 		return nil, err
@@ -91,14 +86,12 @@ func connectToVoiceChannel(s *discordgo.Session, guildID, userID string) (*disco
 }
 
 func playFromYouTubeURL(s *discordgo.Session, guildID, userID, url string) error {
-	// Connect to the user's voice channel.
 	vc, err := connectToVoiceChannel(s, guildID, userID)
 	if err != nil {
 		return err
 	}
 	defer vc.Disconnect()
 
-	// Download the YouTube audio from the given URL.
 	audioFile, err := downloadYouTubeAudio(url)
 	if err != nil {
 		fmt.Println("Error in audioFile", err)
@@ -106,10 +99,8 @@ func playFromYouTubeURL(s *discordgo.Session, guildID, userID, url string) error
 	}
 	defer os.Remove(audioFile)
 
-	// Start playing the audio in the voice channel.
 	vc.Speaking(true)
 
-	// Encode and send the audio packets to the voice connection.
 	dgvoice.PlayAudioFile(vc, audioFile, make(chan bool))
 
 	vc.Speaking(false)
@@ -128,11 +119,12 @@ func downloadYouTubeAudio(url string) (string, error) {
 
 	formats := video.Formats.WithAudioChannels() // only get videos with audio
 	stream, _, err := client.GetStream(video, &formats[0])
+	fmt.Println(stream)
 	if err != nil {
 		panic(err)
 	}
 
-	file, err := os.Create("video.mp4")
+	file, err := os.Create("video.mp3")
 	if err != nil {
 		panic(err)
 	}
